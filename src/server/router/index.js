@@ -13,7 +13,10 @@ const singular = require('./singular')
 const mixins = require('../mixins')
 
 module.exports = (db, opts) => {
-  opts = Object.assign({ foreignKeySuffix: 'Id', _isFake: false }, opts)
+  opts = Object.assign(
+    { foreignKeySuffix: 'Id', _isFake: false, postRoutes: [] },
+    opts
+  )
 
   if (typeof db === 'string') {
     db = low(new FileSync(db))
@@ -75,6 +78,10 @@ module.exports = (db, opts) => {
 
     throw new Error(msg)
   }).value()
+
+  if (opts.postRoutes.length > 0) {
+    router.use(opts.postRoutes)
+  }
 
   router.use((req, res) => {
     if (!res.locals.data) {
